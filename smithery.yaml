@@ -1,0 +1,18 @@
+runtime: "typescript"
+startCommand:
+  type: "http"
+  command: "npm"
+  args: ["run", "start"]
+configSchema:
+  type: "object"
+  properties:
+    apiKey:
+      type: "string"
+      title: "Twenty API Key"
+      description: "Your Twenty CRM API key (generate from Settings > API & Webhooks)"
+    baseUrl:
+      type: "string"
+      title: "Twenty Base URL"
+      description: "Your Twenty CRM instance URL (e.g., https://your-instance.twenty.com)"
+      default: "https://api.twenty.com"
+  required: ["apiKey"]

@@ -127,7 +127,9 @@ twenty-mcp-server/
 - **Type System**: Comprehensive TypeScript definitions for Twenty's data structures
 - **Schema Transformation**: Converts flat tool inputs to Twenty's nested GraphQL schema
 
-## Claude Desktop Integration
+## IDE Integration
+
+### Claude Desktop
 
 To use this server with Claude Desktop, add the following to your Claude Desktop configuration:
 
@@ -144,6 +146,104 @@ To use this server with Claude Desktop, add the following to your Claude Desktop
     }
   }
 }
+```
+
+### Smithery
+
+This server is fully compatible with [Smithery](https://smithery.ai/), the MCP client for developers. The included `smithery.yaml` configuration file provides automatic setup.
+
+1. Install Smithery globally:
+   ```bash
+   npm install -g @smithery/cli
+   ```
+
+2. Build the project:
+   ```bash
+   npm run build
+   ```
+
+3. Start the server with Smithery:
+   ```bash
+   smithery run
+   ```
+
+4. Configure your Twenty CRM credentials when prompted:
+   - **API Key**: Your Twenty CRM API key (from Settings > API & Webhooks)
+   - **Base URL**: Your Twenty instance URL (e.g., `https://your-instance.twenty.com`)
+
+### Cursor IDE
+
+To integrate with [Cursor](https://cursor.so/), add this MCP server configuration:
+
+1. Open Cursor Settings
+2. Navigate to Extensions → MCP Servers
+3. Add a new server with:
+   ```json
+   {
+     "name": "twenty-crm",
+     "command": "node",
+     "args": ["/path/to/twenty-mcp/dist/index.js"],
+     "env": {
+       "TWENTY_API_KEY": "your-api-key-here",
+       "TWENTY_BASE_URL": "https://your-twenty-instance.com"
+     }
+   }
+   ```
+
+### Roo Code
+
+For [Roo Code](https://roo.codes/) integration:
+
+1. Install the MCP extension in Roo Code
+2. Add the server configuration to your workspace settings:
+   ```json
+   {
+     "mcp.servers": {
+       "twenty-crm": {
+         "command": "node",
+         "args": ["/path/to/twenty-mcp/dist/index.js"],
+         "env": {
+           "TWENTY_API_KEY": "your-api-key-here",
+           "TWENTY_BASE_URL": "https://your-twenty-instance.com"
+         }
+       }
+     }
+   }
+   ```
+
+### Cline (VS Code Extension)
+
+To use with [Cline](https://github.com/clinebot/cline) in VS Code:
+
+1. Install the Cline extension from the VS Code marketplace
+2. Open VS Code settings (JSON format)
+3. Add the MCP server configuration:
+   ```json
+   {
+     "cline.mcpServers": {
+       "twenty-crm": {
+         "command": "node",
+         "args": ["/path/to/twenty-mcp/dist/index.js"],
+         "env": {
+           "TWENTY_API_KEY": "your-api-key-here",
+           "TWENTY_BASE_URL": "https://your-twenty-instance.com"
+         }
+       }
+     }
+   }
+   ```
+
+### HTTP Server Mode
+
+For web-based integrations or custom implementations, you can run the server in HTTP mode:
+
+```bash
+npm run start
+```
+
+The server will be available at `http://localhost:3000/mcp` and accepts configuration via query parameters:
+```
+http://localhost:3000/mcp?apiKey=your-api-key&baseUrl=https://your-instance.twenty.com
 ```
 
 ## Contributing
