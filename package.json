@@ -11,9 +11,17 @@
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": ["mcp", "twenty", "crm", "api", "server"],
-  "author": "",
+  "keywords": ["mcp", "twenty", "crm", "api", "server", "graphql", "typescript", "model-context-protocol"],
+  "author": "jezweb",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jezweb/twenty-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jezweb/twenty-mcp/issues"
+  },
+  "homepage": "https://github.com/jezweb/twenty-mcp#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.22.4",
