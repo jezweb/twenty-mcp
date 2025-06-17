@@ -32,13 +32,13 @@ Set the following environment variables:
 
 ```bash
 export TWENTY_API_KEY="your-twenty-api-key"
-export TWENTY_BASE_URL="https://twenty.app.jezweb.com"  # For your self-hosted instance
+export TWENTY_BASE_URL="https://your-twenty-instance.com"  # For self-hosted instances
 ```
 
-### For the jezweb.com instance specifically:
+### Example for self-hosted instance:
 ```bash
-export TWENTY_API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiOTg5ZGQzZC00NTZiLTQzNmEtOTYyYi0yNzMwMWRmM2VkM2EiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiYjk4OWRkM2QtNDU2Yi00MzZhLTk2MmItMjczMDFkZjNlZDNhIiwiaWF0IjoxNzUwMTQwMjEyLCJleHAiOjQ5MDM3NDAyMTEsImp0aSI6ImExZTdjNDIwLTQ2ZjUtNGMxMC04MTRkLTAyM2E3ZmViYmRhNiJ9.fRe_E8TyCBbCq90kC2xuv9Q8t6F_6mkaJcqhYS3i16M"
-export TWENTY_BASE_URL="https://twenty.app.jezweb.com"
+export TWENTY_API_KEY="your-actual-api-key-here"
+export TWENTY_BASE_URL="https://your-twenty-instance.com"
 ```
 
 ## Usage
