@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { TwentyClient } from './client/twenty-client.js';
-import { registerPersonTools, registerCompanyTools, registerTaskTools } from './tools/index.js';
+import { registerPersonTools, registerCompanyTools, registerTaskTools, registerOpportunityTools } from './tools/index.js';
 
 async function main() {
   const port = parseInt(process.env.PORT || '3000');
@@ -57,6 +57,7 @@ async function main() {
       registerPersonTools(server, client);
       registerCompanyTools(server, client);
       registerTaskTools(server, client);
+      registerOpportunityTools(server, client);
 
       // Create streamable HTTP transport
       const transport = new StreamableHTTPServerTransport({

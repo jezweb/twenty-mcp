@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { TwentyClient } from '../client/twenty-client.js';
+import { registerOpportunityTools } from './opportunities.js';
 
 export function registerPersonTools(server: McpServer, client: TwentyClient) {
   server.tool(
@@ -427,3 +428,5 @@ export function registerTaskTools(server: McpServer, client: TwentyClient) {
     }
   });
 }
+
+export { registerOpportunityTools };
