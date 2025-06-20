@@ -3,8 +3,8 @@
 ## Test Execution Summary
 
 - **Date**: 21/06/2025
-- **Time**: 7:15:35 am
-- **Duration**: 8301ms
+- **Time**: 7:59:43 am
+- **Duration**: 2875ms
 - **Environment**: Node v22.14.0 on linux
 - **API Endpoint**: https://twenty.app.jezweb.com
 
@@ -13,27 +13,32 @@
 | Metric | Count |
 |--------|-------|
 | Total Tests | 6 |
-| ✅ Passed | 5 |
-| ❌ Failed | 1 |
-| Success Rate | 83.3% |
+| ✅ Passed | 6 |
+| ❌ Failed | 0 |
+| Success Rate | 100.0% |
 
 ## Test Details
 
 
 ### 1. Initialize MCP Protocol
 
-- **Status**: ❌ FAILED
-- **Duration**: 5005ms
-- **Time**: 7:15:36 am
-- **Error**: Response timeout
+- **Status**: ✅ PASSED
+- **Duration**: 6ms
+- **Time**: 7:59:44 am
 
+- **Result**: ```json
+{
+  "serverName": "twenty-mcp-server",
+  "serverVersion": "1.0.0"
+}
+```
 
 
 ### 2. List Available Tools
 
 - **Status**: ✅ PASSED
-- **Duration**: 15ms
-- **Time**: 7:15:41 am
+- **Duration**: 8ms
+- **Time**: 7:59:44 am
 
 - **Result**: ```json
 {
@@ -70,12 +75,12 @@
 ### 3. Create Test Contact
 
 - **Status**: ✅ PASSED
-- **Duration**: 1473ms
-- **Time**: 7:15:41 am
+- **Duration**: 302ms
+- **Time**: 7:59:44 am
 
 - **Result**: ```json
 {
-  "message": "Contact created successfully: Test User_1750454141213 (ID: ef91bd4a-3cfa-4fc6-95d3-7d23b33a6b00)"
+  "message": "Contact created successfully: Test User_1750456784202 (ID: e228cb96-cf72-4114-8d67-03a5286a291a)"
 }
 ```
 
@@ -83,12 +88,12 @@
 ### 4. Create Test Opportunity
 
 - **Status**: ✅ PASSED
-- **Duration**: 305ms
-- **Time**: 7:15:42 am
+- **Duration**: 396ms
+- **Time**: 7:59:44 am
 
 - **Result**: ```json
 {
-  "message": "Created opportunity: Test Deal 1750454142686 (ID: 222ec1fe-b702-4541-b558-c752cb5975d5)"
+  "message": "Created opportunity: Test Deal 1750456784504 (ID: 64c6fed3-5d8d-48c5-ab79-fcbde71d06c5)"
 }
 ```
 
@@ -96,12 +101,12 @@
 ### 5. List Opportunities by Stage
 
 - **Status**: ✅ PASSED
-- **Duration**: 45ms
-- **Time**: 7:15:42 am
+- **Duration**: 64ms
+- **Time**: 7:59:44 am
 
 - **Result**: ```json
 {
-  "totalOpportunities": 3,
+  "totalOpportunities": 4,
   "hasContent": true
 }
 ```
@@ -110,12 +115,12 @@
 ### 6. Create Test Company
 
 - **Status**: ✅ PASSED
-- **Duration**: 95ms
-- **Time**: 7:15:43 am
+- **Duration**: 249ms
+- **Time**: 7:59:44 am
 
 - **Result**: ```json
 {
-  "message": "Company created successfully: Test Corp 1750454143036 (ID: c10bf9f8-ab73-462a-8e74-4f3478b0502e)"
+  "message": "Company created successfully: Test Corp 1750456784964 (ID: 3f49a325-4573-40a3-bc0a-85ef71a0ddde)"
 }
 ```
 

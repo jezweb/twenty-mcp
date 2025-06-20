@@ -69,24 +69,27 @@ async function sendMessage(server, message) {
       reject(new Error('Response timeout'));
     }, 5000);
     
-    let buffer = '';
-    const lineHandler = (line) => {
-      try {
-        const response = JSON.parse(line);
-        clearTimeout(timeout);
-        resolve(response);
-      } catch (e) {
-        // Not JSON, keep buffering
-      }
-    };
-    
     const rl = readline.createInterface({
       input: server.stdout,
-      output: process.stdout,
       terminal: false
     });
     
-    rl.once('line', lineHandler);
+    const lineHandler = (line) => {
+      try {
+        const response = JSON.parse(line);
+        // Check if this is a response to our message
+        if (response.id === message.id) {
+          clearTimeout(timeout);
+          rl.removeListener('line', lineHandler);
+          rl.close();
+          resolve(response);
+        }
+      } catch (e) {
+        // Not JSON or not our response, continue listening
+      }
+    };
+    
+    rl.on('line', lineHandler);
     server.stdin.write(JSON.stringify(message) + '\n');
   });
 }
@@ -114,7 +117,8 @@ async function executeTests() {
     server.stderr.once('data', (data) => {
       if (data.toString().includes('Twenty MCP Server running')) {
         console.log('✅ Server started successfully');
-        resolve();
+        // Small delay to ensure server is fully ready
+        setTimeout(resolve, 500);
       }
     });
   });
@@ -133,8 +137,8 @@ async function executeTests() {
         id: 1
       });
       
-      if (!response.result?.serverInfo?.name === 'twenty-mcp-server') {
-        throw new Error('Invalid server response');
+      if (!response.result || response.result.serverInfo?.name !== 'twenty-mcp-server') {
+        throw new Error(`Invalid server response: ${JSON.stringify(response)}`);
       }
       
       return {
