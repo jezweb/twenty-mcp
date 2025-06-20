@@ -76,6 +76,27 @@ npm run dev
 #### Note Tools
 - `create_note` - Create a new note
 
+#### Opportunity Tools
+- `create_opportunity` - Create a new opportunity/deal
+- `get_opportunity` - Retrieve opportunity by ID
+- `update_opportunity` - Update existing opportunity
+- `search_opportunities` - Search with advanced filters
+- `list_opportunities_by_stage` - View sales pipeline
+
+## Testing
+
+The project includes comprehensive test suites:
+
+```bash
+# Run smoke tests (no API key needed)
+npm run test:smoke
+
+# Run integration tests (requires API key)
+source .env && npm test
+```
+
+See [TESTING.md](TESTING.md) for detailed testing documentation.
+
 ## API Key Setup
 
 1. Log into your Twenty CRM instance

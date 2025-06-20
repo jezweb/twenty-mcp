@@ -12,7 +12,10 @@
     "start": "node dist/http-server.js",
     "start:stdio": "node dist/index.js",
     "lint": "eslint src --ext .ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node tests/run-tests.js",
+    "test:full": "node tests/test-suite.js",
+    "test:smoke": "node tests/smoke-test.js"
   },
   "keywords": ["mcp", "twenty", "crm", "api", "server", "graphql", "typescript", "model-context-protocol"],
   "author": "jezweb",

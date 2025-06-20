@@ -6,3 +6,8 @@ dist/
 .DS_Store
 *.tsbuildinfo
 claude_desktop_config.json
+
+# Test results (keep directory, ignore files)
+test-results/*
+!test-results/.gitkeep
+!test-results/TEST_REPORT.md
