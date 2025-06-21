@@ -477,9 +477,17 @@ Add your Twenty MCP server configuration:
 <details>
 <summary><b>Smithery</b></summary>
 
+**[Full Smithery Guide →](SMITHERY.md)**
+
+Quick setup:
 1. Install Smithery: `npm install -g @smithery/cli`
-2. Run: `smithery run` in the twenty-mcp directory
+2. Run: `smithery dev` in the twenty-mcp directory
 3. Configure credentials when prompted
+
+Or use the deployed version:
+- Visit [smithery.ai](https://smithery.ai)
+- Search for "Twenty MCP"
+- Click "Use this server"
 </details>
 
 <details>

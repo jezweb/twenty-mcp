@@ -1,0 +1,9 @@
+{
+  "projectId": "twenty-mcp",
+  "name": "Twenty MCP Server",
+  "description": "Connect AI assistants to Twenty CRM with 29 powerful tools",
+  "version": "1.0.0",
+  "runtime": "typescript",
+  "author": "jezweb",
+  "repository": "https://github.com/jezweb/twenty-mcp"
+}

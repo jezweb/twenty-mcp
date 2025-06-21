@@ -11,3 +11,9 @@ claude_desktop_config.json
 test-results/*
 !test-results/.gitkeep
 !test-results/TEST_REPORT.md
+
+# Smithery
+.smithery/build/
+.smithery/deploy/
+.smithery/*.log
+!.smithery/config.json

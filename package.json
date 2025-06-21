@@ -17,9 +17,14 @@
     "test:full": "node tests/test-suite.js",
     "test:smoke": "node tests/smoke-test.js",
     "validate": "node validate-config.js",
-    "setup": "./install.sh"
+    "setup": "./install.sh",
+    "smithery:dev": "smithery dev",
+    "smithery:build": "npm run build && smithery build",
+    "smithery:deploy": "smithery deploy",
+    "docker:build": "docker build -t twenty-mcp .",
+    "docker:run": "docker run -p 3000:3000 -e TWENTY_API_KEY=$TWENTY_API_KEY -e TWENTY_BASE_URL=$TWENTY_BASE_URL twenty-mcp"
   },
-  "keywords": ["mcp", "twenty", "crm", "api", "server", "graphql", "typescript", "model-context-protocol"],
+  "keywords": ["mcp", "twenty", "crm", "api", "server", "graphql", "typescript", "model-context-protocol", "smithery", "ai-tools", "claude", "automation"],
   "author": "jezweb",
   "license": "MIT",
   "repository": {

@@ -10,19 +10,34 @@ import { registerPersonTools, registerCompanyTools, registerTaskTools, registerO
 async function main() {
   const port = parseInt(process.env.PORT || '3000');
   
-  // Parse query parameters to get config
+  // Parse configuration from multiple sources
   function parseConfig(url: string) {
     const urlObj = new URL(url, `http://localhost:${port}`);
     const params = urlObj.searchParams;
     
+    // Priority: URL params > Environment variables > Smithery config
     return {
-      apiKey: params.get('apiKey'),
-      baseUrl: params.get('baseUrl') || 'https://api.twenty.com',
+      apiKey: params.get('apiKey') || 
+              process.env.TWENTY_API_KEY || 
+              process.env.SMITHERY_CONFIG_APIKEY || 
+              process.env.apiKey,
+      baseUrl: params.get('baseUrl') || 
+               process.env.TWENTY_BASE_URL || 
+               process.env.SMITHERY_CONFIG_BASEURL || 
+               process.env.baseUrl ||
+               'https://api.twenty.com',
     };
   }
 
   // Create HTTP server
   const httpServer = createServer(async (req, res) => {
+    // Handle health check endpoint
+    if (req.url === '/health') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'healthy', service: 'twenty-mcp-server' }));
+      return;
+    }
+
     // Only handle /mcp endpoint
     if (!req.url?.startsWith('/mcp')) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
@@ -100,7 +115,17 @@ async function main() {
   });
 
   httpServer.listen(port, () => {
-    console.error(`Twenty MCP Server running on HTTP port ${port} at /mcp endpoint`);
+    console.log(`Twenty MCP Server running at http://localhost:${port}/mcp`);
+    console.log(`Health check available at http://localhost:${port}/health`);
+    
+    // Log configuration source for debugging
+    if (process.env.SMITHERY_CONFIG_APIKEY) {
+      console.log('Running in Smithery environment');
+    } else if (process.env.TWENTY_API_KEY) {
+      console.log('Using environment variables for configuration');
+    } else {
+      console.log(`Example: http://localhost:${port}/mcp?apiKey=YOUR_API_KEY&baseUrl=https://api.twenty.com`);
+    }
   });
 }
 

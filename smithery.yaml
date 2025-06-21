@@ -1,8 +1,21 @@
+# Smithery MCP Server Configuration
+name: "twenty-mcp"
+version: "1.0.0"
+description: "Connect Claude and other AI assistants to Twenty CRM with 29 powerful tools for managing contacts, companies, opportunities, and more"
+author: "jezweb"
+license: "MIT"
+homepage: "https://github.com/jezweb/twenty-mcp"
+repository: "https://github.com/jezweb/twenty-mcp"
+issues: "https://github.com/jezweb/twenty-mcp/issues"
+
+# Server runtime configuration
 runtime: "typescript"
 startCommand:
   type: "http"
   command: "npm"
   args: ["run", "start"]
+
+# Configuration schema for users
 configSchema:
   type: "object"
   properties:
@@ -10,9 +23,54 @@ configSchema:
       type: "string"
       title: "Twenty API Key"
       description: "Your Twenty CRM API key (generate from Settings > API & Webhooks)"
+      minLength: 10
+      pattern: "^[A-Za-z0-9._-]+$"
     baseUrl:
       type: "string"
       title: "Twenty Base URL"
       description: "Your Twenty CRM instance URL (e.g., https://your-instance.twenty.com)"
       default: "https://api.twenty.com"
-  required: ["apiKey"]
+      format: "uri"
+      pattern: "^https?://"
+  required: ["apiKey", "baseUrl"]
+  additionalProperties: false
+
+# MCP tools metadata
+tools:
+  count: 29
+  categories:
+    - name: "Contact Management"
+      tools: ["create_contact", "get_contact", "update_contact", "search_contacts"]
+    - name: "Company Management"
+      tools: ["create_company", "get_company", "update_company", "search_companies"]
+    - name: "Opportunity Management"
+      tools: ["create_opportunity", "get_opportunity", "update_opportunity", "search_opportunities", "list_opportunities_by_stage"]
+    - name: "Activity Management"
+      tools: ["get_activities", "filter_activities", "create_comment", "get_entity_activities"]
+    - name: "Task Management"
+      tools: ["create_task", "get_tasks"]
+    - name: "Note Management"
+      tools: ["create_note"]
+    - name: "Relationship Management"
+      tools: ["get_company_contacts", "get_person_opportunities", "link_opportunity_to_company", "transfer_contact_to_company", "get_relationship_summary", "find_orphaned_records"]
+    - name: "Metadata Discovery"
+      tools: ["list_all_objects", "get_object_schema", "get_field_metadata"]
+
+# Keywords for discovery
+keywords:
+  - "twenty"
+  - "crm"
+  - "customer relationship management"
+  - "sales"
+  - "contacts"
+  - "companies"
+  - "opportunities"
+  - "graphql"
+  - "api"
+  - "automation"
+
+# Platform requirements
+requirements:
+  node: ">=18.0.0"
+  memory: "512MB"
+  timeout: "30s"
