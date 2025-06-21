@@ -3,8 +3,8 @@
 ## Test Execution Summary
 
 - **Date**: 21/06/2025
-- **Time**: 7:59:43 am
-- **Duration**: 2875ms
+- **Time**: 9:23:05 am
+- **Duration**: 2618ms
 - **Environment**: Node v22.14.0 on linux
 - **API Endpoint**: https://twenty.app.jezweb.com
 
@@ -12,8 +12,8 @@
 
 | Metric | Count |
 |--------|-------|
-| Total Tests | 6 |
-| ✅ Passed | 6 |
+| Total Tests | 7 |
+| ✅ Passed | 7 |
 | ❌ Failed | 0 |
 | Success Rate | 100.0% |
 
@@ -23,8 +23,8 @@
 ### 1. Initialize MCP Protocol
 
 - **Status**: ✅ PASSED
-- **Duration**: 6ms
-- **Time**: 7:59:44 am
+- **Duration**: 9ms
+- **Time**: 9:23:06 am
 
 - **Result**: ```json
 {
@@ -37,18 +37,19 @@
 ### 2. List Available Tools
 
 - **Status**: ✅ PASSED
-- **Duration**: 8ms
-- **Time**: 7:59:44 am
+- **Duration**: 5ms
+- **Time**: 9:23:06 am
 
 - **Result**: ```json
 {
-  "totalTools": 16,
+  "totalTools": 23,
   "categories": {
     "contacts": 4,
     "companies": 3,
     "opportunities": 3,
     "tasks": 2,
-    "notes": 1
+    "notes": 1,
+    "activities": 4
   },
   "toolNames": [
     "create_contact",
@@ -66,7 +67,14 @@
     "get_opportunity",
     "update_opportunity",
     "search_opportunities",
-    "list_opportunities_by_stage"
+    "list_opportunities_by_stage",
+    "get_activities",
+    "filter_activities",
+    "create_comment",
+    "get_entity_activities",
+    "list_all_objects",
+    "get_object_schema",
+    "get_field_metadata"
   ]
 }
 ```
@@ -75,12 +83,12 @@
 ### 3. Create Test Contact
 
 - **Status**: ✅ PASSED
-- **Duration**: 302ms
-- **Time**: 7:59:44 am
+- **Duration**: 247ms
+- **Time**: 9:23:06 am
 
 - **Result**: ```json
 {
-  "message": "Contact created successfully: Test User_1750456784202 (ID: e228cb96-cf72-4114-8d67-03a5286a291a)"
+  "message": "Contact created successfully: Test User_1750461786099 (ID: 83d914cf-e44c-4198-91ec-f030a6c16515)"
 }
 ```
 
@@ -88,12 +96,12 @@
 ### 4. Create Test Opportunity
 
 - **Status**: ✅ PASSED
-- **Duration**: 396ms
-- **Time**: 7:59:44 am
+- **Duration**: 157ms
+- **Time**: 9:23:06 am
 
 - **Result**: ```json
 {
-  "message": "Created opportunity: Test Deal 1750456784504 (ID: 64c6fed3-5d8d-48c5-ab79-fcbde71d06c5)"
+  "message": "Created opportunity: Test Deal 1750461786346 (ID: 5410cdb4-8c28-4283-92f3-af2b97f7788a)"
 }
 ```
 
@@ -101,12 +109,12 @@
 ### 5. List Opportunities by Stage
 
 - **Status**: ✅ PASSED
-- **Duration**: 64ms
-- **Time**: 7:59:44 am
+- **Duration**: 88ms
+- **Time**: 9:23:06 am
 
 - **Result**: ```json
 {
-  "totalOpportunities": 4,
+  "totalOpportunities": 8,
   "hasContent": true
 }
 ```
@@ -115,12 +123,26 @@
 ### 6. Create Test Company
 
 - **Status**: ✅ PASSED
-- **Duration**: 249ms
-- **Time**: 7:59:44 am
+- **Duration**: 144ms
+- **Time**: 9:23:06 am
 
 - **Result**: ```json
 {
-  "message": "Company created successfully: Test Corp 1750456784964 (ID: 3f49a325-4573-40a3-bc0a-85ef71a0ddde)"
+  "message": "Company created successfully: Test Corp 1750461786592 (ID: a8867733-cf5e-4bef-90e7-3890a631275b)"
+}
+```
+
+
+### 7. Get Activities Timeline
+
+- **Status**: ✅ PASSED
+- **Duration**: 86ms
+- **Time**: 9:23:06 am
+
+- **Result**: ```json
+{
+  "hasTimelineContent": true,
+  "contentPreview": "Activities Timeline (4 total, showing 4):\n\n[TASK] Client Contact  (13/06/2025)\nAuthor: Deepinder Kaur\n\nID: e94fc175-18db-4dc3-982f-6e3f63f31f11\n---\n\n[TASK] Support Ticket Invoices (13/06/2025)\nAuthor:..."
 }
 ```
 

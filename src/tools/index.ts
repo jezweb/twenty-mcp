@@ -2,6 +2,8 @@ import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { TwentyClient } from '../client/twenty-client.js';
 import { registerOpportunityTools } from './opportunities.js';
+import { registerActivityTools } from './activities.js';
+import { registerMetadataTools } from './metadata.js';
 
 export function registerPersonTools(server: McpServer, client: TwentyClient) {
   server.tool(
@@ -429,4 +431,265 @@ export function registerTaskTools(server: McpServer, client: TwentyClient) {
   });
 }
 
-export { registerOpportunityTools };
+export function registerRelationshipTools(server: McpServer, client: TwentyClient) {
+  server.tool(
+    'get_company_contacts',
+    'Get all contacts (people) associated with a specific company',
+    {
+      companyId: z.string().describe('The ID of the company to get contacts for'),
+    },
+    async (args) => {
+      try {
+        const result = await client.getCompanyContacts(args.companyId);
+        
+        const contactsList = result.contacts.map(contact => 
+          `• ${contact.name.firstName} ${contact.name.lastName}` +
+          (contact.jobTitle ? ` - ${contact.jobTitle}` : '') +
+          (contact.email ? ` (${contact.email})` : '') +
+          (contact.phone ? ` | Phone: ${contact.phone}` : '') +
+          `\n  ID: ${contact.id}`
+        ).join('\n');
+
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Company Contacts for "${result.companyName}"\n` +
+                  `Company ID: ${result.companyId}\n` +
+                  `Total Contacts: ${result.totalContacts}\n\n` +
+                  (result.totalContacts > 0 ? `Contacts:\n${contactsList}` : 'No contacts found for this company.')
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Error retrieving company contacts: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+  );
+
+  server.tool(
+    'get_person_opportunities',
+    'Get all opportunities where a specific person is the point of contact',
+    {
+      personId: z.string().describe('The ID of the person to get opportunities for'),
+    },
+    async (args) => {
+      try {
+        const result = await client.getPersonOpportunities(args.personId);
+        
+        const opportunitiesList = result.opportunities.map(opp => {
+          let oppText = `• ${opp.name}`;
+          if (opp.stage) oppText += ` (${opp.stage})`;
+          if (opp.amount) {
+            const amount = opp.amount.amountMicros / 1000000;
+            oppText += ` - ${opp.amount.currencyCode} ${amount.toLocaleString()}`;
+          }
+          if (opp.company) oppText += ` | Company: ${opp.company.name}`;
+          if (opp.closeDate) oppText += ` | Close: ${opp.closeDate}`;
+          oppText += `\n  ID: ${opp.id}`;
+          return oppText;
+        }).join('\n');
+
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Opportunities for "${result.personName}"\n` +
+                  `Person ID: ${result.personId}\n` +
+                  `Total Opportunities: ${result.totalOpportunities}\n\n` +
+                  (result.totalOpportunities > 0 ? `Opportunities:\n${opportunitiesList}` : 'No opportunities found for this person.')
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Error retrieving person opportunities: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+  );
+
+  server.tool(
+    'link_opportunity_to_company',
+    'Link an opportunity to a company and/or point of contact',
+    {
+      opportunityId: z.string().describe('The ID of the opportunity to update'),
+      companyId: z.string().optional().describe('The ID of the company to link to (optional)'),
+      pointOfContactId: z.string().optional().describe('The ID of the person to set as point of contact (optional)'),
+    },
+    async (args) => {
+      try {
+        if (!args.companyId && !args.pointOfContactId) {
+          return {
+            content: [{
+              type: 'text' as const,
+              text: 'Error: At least one of companyId or pointOfContactId must be provided'
+            }]
+          };
+        }
+
+        const result = await client.linkOpportunityToCompany({
+          opportunityId: args.opportunityId,
+          companyId: args.companyId,
+          pointOfContactId: args.pointOfContactId
+        });
+
+        let relationshipInfo = '';
+        if (result.company) {
+          relationshipInfo += `Company: ${result.company.name} (${result.company.id})\n`;
+        }
+        if (result.pointOfContact) {
+          relationshipInfo += `Point of Contact: ${result.pointOfContact.name.firstName} ${result.pointOfContact.name.lastName} (${result.pointOfContact.id})\n`;
+        }
+
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Successfully linked opportunity "${result.name}"\n` +
+                  `Opportunity ID: ${result.id}\n\n` +
+                  `Updated Relationships:\n${relationshipInfo}`
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Error linking opportunity: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+  );
+
+  server.tool(
+    'transfer_contact_to_company',
+    'Transfer a contact (person) from one company to another',
+    {
+      contactId: z.string().describe('The ID of the contact to transfer'),
+      toCompanyId: z.string().describe('The ID of the company to transfer the contact to'),
+      fromCompanyId: z.string().optional().describe('The ID of the current company (optional, for validation)'),
+    },
+    async (args) => {
+      try {
+        const result = await client.transferContactToCompany({
+          contactId: args.contactId,
+          fromCompanyId: args.fromCompanyId,
+          toCompanyId: args.toCompanyId
+        });
+
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Successfully transferred contact "${result.name.firstName} ${result.name.lastName}"\n` +
+                  `Contact ID: ${result.id}\n` +
+                  `New Company: ${result.company?.name || 'Unknown'} (${result.companyId})`
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Error transferring contact: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+  );
+
+  server.tool(
+    'get_relationship_summary',
+    'Get a summary of all relationships for a specific entity (company or person)',
+    {
+      entityId: z.string().describe('The ID of the entity to get relationship summary for'),
+      entityType: z.enum(['company', 'person']).describe('The type of entity (company or person)'),
+    },
+    async (args) => {
+      try {
+        const result = await client.getRelationshipSummary(args.entityId, args.entityType);
+        
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Relationship Summary for ${args.entityType}: ${args.entityId}\n\n` +
+                  `Connected Relationships:\n` +
+                  `• Companies: ${result.relationships.companies}\n` +
+                  `• Contacts: ${result.relationships.contacts}\n` +
+                  `• Opportunities: ${result.relationships.opportunities}\n` +
+                  `• Tasks: ${result.relationships.tasks}\n` +
+                  `• Activities: ${result.relationships.activities}`
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Error getting relationship summary: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+  );
+
+  server.tool(
+    'find_orphaned_records',
+    'Find records that are missing important relationships (companies without contacts, contacts without companies, etc.)',
+    {},
+    async (args) => {
+      try {
+        const result = await client.findOrphanedRecords();
+        
+        let report = 'Orphaned Records Report\n====================\n\n';
+        
+        // Companies without contacts
+        if (result.companies.length > 0) {
+          report += `Companies without contacts (${result.companies.length}):\n`;
+          result.companies.forEach(company => {
+            report += `• ${company.name} (${company.opportunityCount} opportunities)\n  ID: ${company.id}\n`;
+          });
+          report += '\n';
+        }
+        
+        // Contacts without companies
+        if (result.contacts.length > 0) {
+          report += `Contacts without companies (${result.contacts.length}):\n`;
+          result.contacts.forEach(contact => {
+            report += `• ${contact.name} (${contact.opportunityCount} opportunities)\n  ID: ${contact.id}\n`;
+          });
+          report += '\n';
+        }
+        
+        // Summary
+        report += `Summary:\n`;
+        report += `• ${result.companies.length} companies without contacts\n`;
+        report += `• ${result.contacts.length} contacts without companies\n`;
+        report += `• ${result.opportunities.length} opportunities with missing relationships\n`;
+        report += `• ${result.tasks.length} tasks without assignees`;
+
+        if (result.companies.length === 0 && result.contacts.length === 0 && 
+            result.opportunities.length === 0 && result.tasks.length === 0) {
+          report += '\n\n✅ No orphaned records found! All records have proper relationships.';
+        }
+
+        return {
+          content: [{
+            type: 'text' as const,
+            text: report
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Error finding orphaned records: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }]
+        };
+      }
+    }
+  );
+}
+
+export { registerOpportunityTools, registerActivityTools, registerMetadataTools };

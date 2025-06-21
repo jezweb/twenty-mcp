@@ -162,7 +162,8 @@ async function executeTests() {
         companies: tools.filter(t => t.name.includes('company')).length,
         opportunities: tools.filter(t => t.name.includes('opportunity')).length,
         tasks: tools.filter(t => t.name.includes('task')).length,
-        notes: tools.filter(t => t.name.includes('note')).length
+        notes: tools.filter(t => t.name.includes('note')).length,
+        activities: tools.filter(t => t.name.includes('activities') || t.name.includes('comment')).length
       };
       
       return {
@@ -261,6 +262,33 @@ async function executeTests() {
       }
       
       return { message: response.result.content[0].text };
+    });
+    
+    // Test 7: Get Activities Timeline
+    await runTest('Get Activities Timeline', async () => {
+      const response = await sendMessage(server, {
+        jsonrpc: '2.0',
+        method: 'tools/call',
+        params: {
+          name: 'get_activities',
+          arguments: {
+            limit: 10
+          }
+        },
+        id: 7
+      });
+      
+      if (response.result?.isError) {
+        throw new Error(response.result.content[0].text);
+      }
+      
+      const content = response.result.content[0].text;
+      const hasTimelineContent = content.includes('Activities Timeline');
+      
+      return {
+        hasTimelineContent,
+        contentPreview: content.substring(0, 200) + '...'
+      };
     });
     
   } finally {

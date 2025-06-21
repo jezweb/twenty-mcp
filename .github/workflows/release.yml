@@ -1,0 +1,156 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run tests
+      run: npm run test:smoke
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Create release package
+      run: |
+        # Create a clean distribution
+        mkdir -p release/twenty-mcp-server
+        
+        # Copy essential files
+        cp -r dist/ release/twenty-mcp-server/
+        cp package.json release/twenty-mcp-server/
+        cp package-lock.json release/twenty-mcp-server/
+        cp README.md release/twenty-mcp-server/
+        cp LICENSE release/twenty-mcp-server/
+        cp .env.example release/twenty-mcp-server/
+        cp install.sh release/twenty-mcp-server/
+        cp validate-config.js release/twenty-mcp-server/
+        cp -r tests/ release/twenty-mcp-server/
+        
+        # Create installation instructions
+        cat > release/twenty-mcp-server/INSTALL.md << 'EOF'
+        # Twenty MCP Server Installation
+        
+        ## Quick Start
+        
+        1. **Install dependencies**:
+           ```bash
+           npm install --production
+           ```
+        
+        2. **Configure environment**:
+           ```bash
+           cp .env.example .env
+           nano .env  # Add your Twenty CRM credentials
+           ```
+        
+        3. **Validate configuration**:
+           ```bash
+           npm run validate
+           ```
+        
+        4. **Test the server**:
+           ```bash
+           npm test
+           ```
+        
+        5. **Configure your IDE**:
+           - Use absolute path: `$(pwd)/dist/index.js`
+           - See README.md for specific IDE instructions
+        
+        ## Support
+        
+        - Documentation: README.md
+        - Issues: https://github.com/jezweb/twenty-mcp/issues
+        EOF
+        
+        # Create archive
+        cd release
+        tar -czf twenty-mcp-server-${{ github.ref_name }}.tar.gz twenty-mcp-server/
+        zip -r twenty-mcp-server-${{ github.ref_name }}.zip twenty-mcp-server/
+        
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Twenty MCP Server ${{ github.ref_name }}
+        body: |
+          ## Twenty MCP Server ${{ github.ref_name }}
+          
+          ### 🚀 Features
+          - **29 MCP Tools** for comprehensive Twenty CRM integration
+          - **Contact, Company, Opportunity Management**
+          - **Relationship Management & Data Quality Tools**
+          - **Metadata Discovery & Schema Exploration**
+          - **Full TypeScript Support**
+          
+          ### 📦 Installation
+          
+          **Option 1: Download Release Archive**
+          1. Download `twenty-mcp-server-${{ github.ref_name }}.tar.gz` or `.zip`
+          2. Extract and run: `./install.sh` or follow `INSTALL.md`
+          
+          **Option 2: Clone Repository**
+          ```bash
+          git clone https://github.com/jezweb/twenty-mcp.git
+          cd twenty-mcp
+          ./install.sh
+          ```
+          
+          ### 🔧 Configuration
+          
+          1. Get your API key from Twenty CRM → Settings → API & Webhooks
+          2. Set environment variables or create `.env` file
+          3. Run `npm run validate` to check configuration
+          4. Configure your IDE (Claude Desktop, Cursor, etc.)
+          
+          ### 📚 Documentation
+          
+          - **Installation Guide**: README.md
+          - **Testing Guide**: TESTING.md  
+          - **Troubleshooting**: See README.md troubleshooting section
+          
+          ### 🐛 Issues
+          
+          Report issues at: https://github.com/jezweb/twenty-mcp/issues
+        draft: false
+        prerelease: false
+        
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./release/twenty-mcp-server-${{ github.ref_name }}.tar.gz
+        asset_name: twenty-mcp-server-${{ github.ref_name }}.tar.gz
+        asset_content_type: application/gzip
+        
+    - name: Upload Release Assets (ZIP)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./release/twenty-mcp-server-${{ github.ref_name }}.zip
+        asset_name: twenty-mcp-server-${{ github.ref_name }}.zip
+        asset_content_type: application/zip

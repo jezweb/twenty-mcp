@@ -1,16 +1,10 @@
-name: MCP Server Tests
+name: Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch:
-    inputs:
-      test_api_key:
-        description: 'Twenty API Key for testing (optional - uses secret if not provided)'
-        required: false
-        type: string
 
 jobs:
   test:
@@ -18,87 +12,58 @@ jobs:
     
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [18, 20, 22]
     
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    
+        
     - name: Install dependencies
       run: npm ci
-    
+      
+    - name: Run linting
+      run: npm run lint
+      
+    - name: Run type checking
+      run: npm run typecheck
+      
     - name: Build project
       run: npm run build
-    
-    - name: Run linter
-      run: npm run lint
-      continue-on-error: true
-    
-    - name: Run type check
-      run: npm run typecheck
-    
-    - name: Run tests
-      env:
-        TWENTY_API_KEY: ${{ github.event.inputs.test_api_key || secrets.TWENTY_API_KEY }}
-        TWENTY_BASE_URL: ${{ secrets.TWENTY_BASE_URL || 'https://twenty.app.jezweb.com' }}
-      run: |
-        if [ -z "$TWENTY_API_KEY" ]; then
-          echo "⚠️ No API key provided - skipping integration tests"
-          echo "To run tests, either:"
-          echo "1. Add TWENTY_API_KEY to repository secrets"
-          echo "2. Run workflow manually with test_api_key input"
-          exit 0
-        fi
-        npm test
-    
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results-node${{ matrix.node-version }}
-        path: test-results/
-        retention-days: 30
-    
-    - name: Create test summary
-      if: always()
-      run: |
-        if [ -f "test-results/TEST_REPORT.md" ]; then
-          echo "## Test Results for Node ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
-          cat test-results/TEST_REPORT.md >> $GITHUB_STEP_SUMMARY
-        fi
-
-  publish-results:
-    needs: test
+      
+    - name: Run smoke tests
+      run: npm run test:smoke
+      
+    - name: Validate configuration structure
+      run: node validate-config.js || true  # Don't fail on missing API key
+      
+  integration-test:
     runs-on: ubuntu-latest
-    if: always()
+    if: ${{ vars.TWENTY_API_KEY != '' }}
     
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Download all test results
-      uses: actions/download-artifact@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        path: all-results/
-    
-    - name: Combine test results
-      run: |
-        echo "# Combined Test Results" > combined-results.md
-        echo "" >> combined-results.md
-        for dir in all-results/*/; do
-          if [ -f "$dir/TEST_REPORT.md" ]; then
-            echo "## ${dir##*/}" >> combined-results.md
-            cat "$dir/TEST_REPORT.md" >> combined-results.md
-            echo "" >> combined-results.md
-          fi
-        done
-    
-    - name: Update test badge
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: |
-        # This would update a test status badge in the README
-        echo "Test results published"
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Run integration tests
+      env:
+        TWENTY_API_KEY: ${{ vars.TWENTY_API_KEY }}
+        TWENTY_BASE_URL: ${{ vars.TWENTY_BASE_URL }}
+      run: npm test
