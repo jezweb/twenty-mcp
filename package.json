@@ -1,7 +1,7 @@
 {
   "name": "twenty-mcp-server",
-  "version": "1.0.0",
-  "description": "Model Context Protocol server for Twenty CRM API integration",
+  "version": "1.1.0",
+  "description": "Model Context Protocol server for Twenty CRM API integration with OAuth 2.1 authentication support",
   "main": "dist/http-server.js",
   "module": "./src/http-server.ts",
   "type": "module",
@@ -16,8 +16,10 @@
     "test": "node tests/run-tests.js",
     "test:full": "node tests/test-suite.js",
     "test:smoke": "node tests/smoke-test.js",
+    "test:oauth": "node tests/oauth-test-suite.js",
     "validate": "node validate-config.js",
     "setup": "./install.sh",
+    "setup:oauth": "tsx src/cli/oauth-setup.ts",
     "smithery:dev": "smithery dev",
     "smithery:build": "npm run build && smithery build",
     "smithery:deploy": "smithery deploy",
@@ -39,7 +41,9 @@
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.22.4",
     "graphql": "^16.8.1",
-    "graphql-request": "^6.1.0"
+    "graphql-request": "^6.1.0",
+    "@clerk/clerk-sdk-node": "^5.0.0",
+    "@clerk/types": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
