@@ -43,8 +43,11 @@ This project follows a standard code of conduct to ensure a welcoming environmen
 - npm
 - A Twenty CRM instance for testing
 - Git
+- **For OAuth development**: Clerk account and application
 
 ### Initial Setup
+
+#### Basic Setup (API Key Mode)
 
 ```bash
 # Install dependencies
@@ -62,6 +65,47 @@ npm run build
 # Run tests to verify setup
 npm test
 ```
+
+#### OAuth Development Setup
+
+For OAuth feature development:
+
+```bash
+# Install dependencies
+npm install
+
+# Set up OAuth configuration interactively
+npm run setup:oauth
+
+# Or manually configure OAuth in .env:
+# AUTH_ENABLED=true
+# CLERK_SECRET_KEY=sk_test_your_secret_key
+# CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key
+# CLERK_DOMAIN=your-app.clerk.accounts.dev
+# API_KEY_ENCRYPTION_SECRET=your-32-byte-hex-string
+
+# Build the project
+npm run build
+
+# Run all test suites including OAuth
+npm run test:smoke && npm test && npm run test:oauth
+```
+
+#### Clerk Setup for OAuth Development
+
+1. **Create Clerk Application**:
+   - Visit [dashboard.clerk.com](https://dashboard.clerk.com)
+   - Create a new application
+   - Choose authentication methods (email, social, etc.)
+
+2. **Get Credentials**:
+   - Copy Publishable Key (starts with `pk_test_`)
+   - Copy Secret Key (starts with `sk_test_`)
+   - Note your Clerk domain
+
+3. **Configure OAuth Scopes** (optional):
+   - Add custom scopes: `twenty:read`, `twenty:write`
+   - Configure redirect URIs for testing
 
 ### Development Workflow
 
@@ -144,9 +188,20 @@ npm run test:smoke
 # Integration tests (requires API key)
 npm test
 
+# OAuth tests (requires OAuth setup)
+npm run test:oauth
+
 # Full test suite with detailed output
 npm run test:full
+
+# Run all test suites
+npm run test:smoke && npm test && npm run test:oauth
 ```
+
+**OAuth Testing Requirements:**
+- Must have OAuth configured (run `npm run setup:oauth`)
+- Requires valid Clerk credentials
+- Tests authentication, encryption, and security features
 
 ### Writing Tests
 

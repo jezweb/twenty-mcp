@@ -1,10 +1,13 @@
 {
   "name": "twenty-mcp-server",
   "version": "1.1.0",
-  "description": "Model Context Protocol server for Twenty CRM API integration with OAuth 2.1 authentication support",
+  "description": "Easy-to-install Model Context Protocol server for Twenty CRM. Simple 'npm install -g' setup with interactive CLI wizard for non-technical users.",
   "main": "dist/http-server.js",
   "module": "./src/http-server.ts",
   "type": "module",
+  "bin": {
+    "twenty-mcp": "./dist/cli/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
@@ -24,9 +27,31 @@
     "smithery:build": "npm run build && smithery build",
     "smithery:deploy": "smithery deploy",
     "docker:build": "docker build -t twenty-mcp .",
-    "docker:run": "docker run -p 3000:3000 -e TWENTY_API_KEY=$TWENTY_API_KEY -e TWENTY_BASE_URL=$TWENTY_BASE_URL twenty-mcp"
+    "docker:run": "docker run -p 3000:3000 -e TWENTY_API_KEY=$TWENTY_API_KEY -e TWENTY_BASE_URL=$TWENTY_BASE_URL twenty-mcp",
+    "prepack": "npm run build && npm run test:smoke",
+    "prepublishOnly": "npm run prepack",
+    "postinstall": "node -e \"console.log('\\n🎉 Twenty MCP Server installed! Run \\\"twenty-mcp setup\\\" to get started.\\n')\""
   },
-  "keywords": ["mcp", "twenty", "crm", "api", "server", "graphql", "typescript", "model-context-protocol", "smithery", "ai-tools", "claude", "automation"],
+  "keywords": [
+    "mcp",
+    "twenty",
+    "crm",
+    "api",
+    "server",
+    "graphql",
+    "typescript",
+    "model-context-protocol",
+    "smithery",
+    "ai-tools",
+    "claude",
+    "automation",
+    "cli",
+    "easy-install",
+    "interactive-setup",
+    "oauth",
+    "ip-protection",
+    "enterprise"
+  ],
   "author": "jezweb",
   "license": "MIT",
   "repository": {
@@ -38,12 +63,16 @@
   },
   "homepage": "https://github.com/jezweb/twenty-mcp#readme",
   "dependencies": {
+    "@clerk/clerk-sdk-node": "^5.0.0",
+    "@clerk/types": "^4.0.0",
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "zod": "^3.22.4",
+    "@types/inquirer": "^9.0.8",
+    "chalk": "^5.4.1",
+    "commander": "^14.0.0",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
-    "@clerk/clerk-sdk-node": "^5.0.0",
-    "@clerk/types": "^4.0.0"
+    "inquirer": "^12.6.3",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
@@ -55,5 +84,16 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "preferGlobal": true,
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE",
+    "TOOLS.md",
+    "OAUTH.md"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

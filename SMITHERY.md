@@ -20,10 +20,16 @@ Smithery is a platform that makes it easy to:
    - Click on the server to view details
 
 2. **Configure**
+   
+   **API Key Mode (Simple):**
    - Click "Use this server"
    - Enter your Twenty CRM credentials:
      - API Key: Get from Twenty CRM → Settings → API & Webhooks
      - Base URL: Your Twenty instance URL (default: https://api.twenty.com)
+   
+   **OAuth Mode (Advanced):**
+   - Requires custom deployment with OAuth configuration
+   - See [OAuth Deployment](#oauth-deployment) section below
 
 3. **Connect to Your IDE**
    - Follow Smithery's IDE connection guide
@@ -169,6 +175,107 @@ For Smithery-specific features:
 - Update `smithery.yaml` for configuration changes
 - Modify `Dockerfile` for deployment changes
 - Update health check endpoint for monitoring
+
+## OAuth Deployment
+
+The Twenty MCP Server supports OAuth 2.1 authentication for multi-user deployments on Smithery.
+
+### 🔐 OAuth Features on Smithery
+
+- **User-Specific API Keys**: Each user manages their own Twenty CRM connection
+- **Encrypted Storage**: API keys encrypted with AES-256-GCM
+- **Secure Authentication**: Clerk-based OAuth 2.1 implementation
+- **Scalable**: Supports multiple users per deployment
+
+### 📋 OAuth Setup for Smithery
+
+1. **Configure OAuth Environment Variables**:
+   ```yaml
+   # smithery.yaml
+   configSchema:
+     properties:
+       # Traditional API key (optional fallback)
+       apiKey:
+         type: string
+         title: "Twenty API Key"
+         description: "Your Twenty CRM API key (fallback for non-OAuth users)"
+       
+       # OAuth Configuration
+       authEnabled:
+         type: boolean
+         title: "Enable OAuth"
+         description: "Enable OAuth 2.1 authentication"
+         default: false
+       
+       clerkSecretKey:
+         type: string
+         title: "Clerk Secret Key"
+         description: "Clerk secret key for OAuth authentication"
+         format: password
+       
+       clerkPublishableKey:
+         type: string
+         title: "Clerk Publishable Key"  
+         description: "Clerk publishable key for OAuth authentication"
+       
+       encryptionSecret:
+         type: string
+         title: "Encryption Secret"
+         description: "32-byte hex string for encrypting user API keys"
+         format: password
+   ```
+
+2. **Environment Variable Mapping**:
+   ```yaml
+   # The server automatically maps Smithery config to environment variables:
+   # SMITHERY_CONFIG_APIKEY -> TWENTY_API_KEY
+   # SMITHERY_CONFIG_AUTHENABLED -> AUTH_ENABLED
+   # SMITHERY_CONFIG_CLERKSECRETKEY -> CLERK_SECRET_KEY
+   # SMITHERY_CONFIG_CLERKPUBLISHABLEKEY -> CLERK_PUBLISHABLE_KEY
+   # SMITHERY_CONFIG_ENCRYPTIONSECRET -> API_KEY_ENCRYPTION_SECRET
+   ```
+
+3. **Deploy with OAuth**:
+   ```bash
+   # Update smithery.yaml with OAuth configuration
+   npm run build
+   smithery deploy
+   ```
+
+### 🔧 OAuth Endpoints on Smithery
+
+When OAuth is enabled, your Smithery deployment provides:
+
+- **Discovery**: `/.well-known/oauth-protected-resource`
+- **Auth Server**: `/.well-known/oauth-authorization-server`  
+- **API Key Management**: `/api/keys` (requires Bearer token)
+- **Health Check**: `/health` (shows auth status)
+
+### 🧪 Testing OAuth on Smithery
+
+```bash
+# Test OAuth discovery
+curl https://your-server.smithery.ai/.well-known/oauth-protected-resource
+
+# Test with Bearer token (after OAuth flow)
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+     https://your-server.smithery.ai/api/keys
+```
+
+### 📖 OAuth Documentation
+
+For complete OAuth setup and integration guide:
+- **[OAUTH.md](OAUTH.md)**: Comprehensive OAuth 2.1 implementation guide
+- **Examples**: Check `examples/` directory for client implementations
+- **Testing**: Use `npm run test:oauth` for comprehensive OAuth testing
+
+### ⚙️ Deployment Modes
+
+| Mode | Use Case | Configuration |
+|------|----------|---------------|
+| **API Key Only** | Single user, simple setup | Set `apiKey` in Smithery config |
+| **OAuth Only** | Multi-user, enhanced security | Set OAuth configs, no `apiKey` |
+| **Hybrid** | Gradual migration | Set both, OAuth takes precedence |
 
 ## Support
 

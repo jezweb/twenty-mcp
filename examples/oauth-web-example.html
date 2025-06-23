@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twenty MCP OAuth Example</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .step {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .step.completed {
+            border-left-color: #28a745;
+            background: #f8fff8;
+        }
+        
+        .step.error {
+            border-left-color: #dc3545;
+            background: #fff8f8;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .code-block {
+            background: #f1f3f4;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #99d3ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Twenty MCP Server OAuth Integration</h1>
+    <p>This example demonstrates how to integrate OAuth 2.1 authentication with the Twenty MCP Server in a web application.</p>
+
+    <div class="container">
+        <h2>Configuration</h2>
+        <div>
+            <label for="serverUrl">MCP Server URL:</label>
+            <input type="text" id="serverUrl" value="http://localhost:3000" style="width: 300px; padding: 5px;">
+        </div>
+        <div style="margin-top: 10px;">
+            <label for="apiKey">Twenty API Key:</label>
+            <input type="password" id="apiKey" placeholder="Enter your Twenty API key" style="width: 300px; padding: 5px;">
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>OAuth Flow Steps</h2>
+        
+        <div id="step1" class="step">
+            <h3>1. Server Health Check</h3>
+            <p>Check if the MCP server is running and OAuth is enabled</p>
+            <button onclick="checkServerHealth()">Check Health</button>
+            <div id="healthResult"></div>
+        </div>
+
+        <div id="step2" class="step">
+            <h3>2. Discover OAuth Endpoints</h3>
+            <p>Discover OAuth protected resource and authorization server metadata</p>
+            <button onclick="discoverEndpoints()">Discover Endpoints</button>
+            <div id="discoveryResult"></div>
+        </div>
+
+        <div id="step3" class="step">
+            <h3>3. OAuth Authorization</h3>
+            <p>Start the OAuth authorization flow (simulated for demo)</p>
+            <button onclick="startOAuthFlow()">Start Authorization</button>
+            <div id="authResult"></div>
+        </div>
+
+        <div id="step4" class="step">
+            <h3>4. Store API Key</h3>
+            <p>Store your Twenty API key securely</p>
+            <button onclick="storeApiKey()">Store API Key</button>
+            <div id="storeResult"></div>
+        </div>
+
+        <div id="step5" class="step">
+            <h3>5. Make MCP Request</h3>
+            <p>Make an authenticated request to the MCP server</p>
+            <button onclick="makeMCPRequest()">Make MCP Request</button>
+            <div id="mcpResult"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Integration Code</h2>
+        <p>Here's how you would integrate this in your application:</p>
+        
+        <h3>JavaScript (Browser)</h3>
+        <div class="code-block">// 1. Discover OAuth endpoints
+const discovery = await fetch('http://localhost:3000/.well-known/oauth-protected-resource');
+const metadata = await discovery.json();
+
+// 2. Redirect to authorization server
+const authUrl = new URL(metadata.authorization_servers[0] + '/oauth/authorize');
+authUrl.searchParams.set('response_type', 'code');
+authUrl.searchParams.set('client_id', 'YOUR_CLIENT_ID');
+authUrl.searchParams.set('redirect_uri', 'YOUR_REDIRECT_URI');
+authUrl.searchParams.set('scope', 'twenty:read twenty:write');
+
+window.location.href = authUrl.toString();
+
+// 3. After callback, store API key
+await fetch('http://localhost:3000/api/keys', {
+    method: 'POST',
+    headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        apiKey: 'your-twenty-api-key',
+        baseUrl: 'https://api.twenty.com'
+    })
+});
+
+// 4. Make authenticated MCP requests
+await fetch('http://localhost:3000/mcp', {
+    method: 'POST',
+    headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'initialize',
+        params: {},
+        id: 1
+    })
+});</div>
+
+        <h3>curl Examples</h3>
+        <div class="code-block"># Discover OAuth endpoints
+curl http://localhost:3000/.well-known/oauth-protected-resource
+
+# Store API key (with valid Bearer token)
+curl -X POST http://localhost:3000/api/keys \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"apiKey":"your-twenty-api-key","baseUrl":"https://api.twenty.com"}'
+
+# Make authenticated MCP request
+curl -X POST http://localhost:3000/mcp \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"initialize","params":{},"id":1}'</div>
+    </div>
+
+    <script>
+        let mockAccessToken = null;
+        
+        function getServerUrl() {
+            return document.getElementById('serverUrl').value.trim();
+        }
+        
+        function getApiKey() {
+            return document.getElementById('apiKey').value.trim();
+        }
+        
+        function showResult(elementId, content, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${content}</div>`;
+        }
+        
+        function markStepCompleted(stepId) {
+            document.getElementById(stepId).classList.add('completed');
+        }
+        
+        function markStepError(stepId) {
+            document.getElementById(stepId).classList.add('error');
+        }
+        
+        async function checkServerHealth() {
+            try {
+                const response = await fetch(`${getServerUrl()}/health`);
+                const health = await response.json();
+                
+                if (health.status === 'healthy') {
+                    showResult('healthResult', 
+                        `✅ Server is healthy<br>
+                         🔐 Auth enabled: ${health.authEnabled ? 'Yes' : 'No'}<br>
+                         🏢 Service: ${health.service}`, 'success');
+                    markStepCompleted('step1');
+                } else {
+                    showResult('healthResult', `❌ Server unhealthy: ${health.status}`, 'error');
+                    markStepError('step1');
+                }
+            } catch (error) {
+                showResult('healthResult', `❌ Cannot connect to server: ${error.message}`, 'error');
+                markStepError('step1');
+            }
+        }
+        
+        async function discoverEndpoints() {
+            try {
+                // Protected resource metadata
+                const prResponse = await fetch(`${getServerUrl()}/.well-known/oauth-protected-resource`);
+                const prMetadata = await prResponse.json();
+                
+                // Authorization server metadata
+                const asResponse = await fetch(`${getServerUrl()}/.well-known/oauth-authorization-server`);
+                const asMetadata = await asResponse.json();
+                
+                showResult('discoveryResult', 
+                    `✅ OAuth endpoints discovered<br>
+                     📍 Resource: ${prMetadata.resource}<br>
+                     🔐 Auth Server: ${asMetadata.issuer}<br>
+                     🌐 Auth Endpoint: ${asMetadata.authorization_endpoint}<br>
+                     🎫 Token Endpoint: ${asMetadata.token_endpoint}`, 'success');
+                markStepCompleted('step2');
+            } catch (error) {
+                showResult('discoveryResult', `❌ Discovery failed: ${error.message}`, 'error');
+                markStepError('step2');
+            }
+        }
+        
+        async function startOAuthFlow() {
+            // Simulate OAuth flow for demo
+            mockAccessToken = 'demo_token_' + Math.random().toString(36).substring(2);
+            
+            showResult('authResult', 
+                `✅ OAuth flow simulated<br>
+                 🎫 Mock Access Token: ${mockAccessToken.substring(0, 20)}...<br>
+                 ℹ️ In production, this would redirect to Clerk for real authorization`, 'success');
+            markStepCompleted('step3');
+        }
+        
+        async function storeApiKey() {
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                showResult('storeResult', '❌ Please enter a Twenty API key first', 'error');
+                return;
+            }
+            
+            if (!mockAccessToken) {
+                showResult('storeResult', '❌ Please complete OAuth authorization first', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${getServerUrl()}/api/keys`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${mockAccessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        apiKey: apiKey,
+                        baseUrl: 'https://api.twenty.com'
+                    })
+                });
+                
+                if (response.status === 401) {
+                    showResult('storeResult', 
+                        `❌ Authentication failed (expected with mock token)<br>
+                         ℹ️ In production, use real Clerk tokens`, 'error');
+                } else if (response.ok) {
+                    showResult('storeResult', '✅ API key stored successfully', 'success');
+                    markStepCompleted('step4');
+                } else {
+                    const error = await response.text();
+                    showResult('storeResult', `❌ Failed to store API key: ${error}`, 'error');
+                }
+            } catch (error) {
+                showResult('storeResult', `❌ Request failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function makeMCPRequest() {
+            if (!mockAccessToken) {
+                showResult('mcpResult', '❌ Please complete OAuth authorization first', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${getServerUrl()}/mcp`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${mockAccessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        method: 'initialize',
+                        params: {},
+                        id: 1
+                    })
+                });
+                
+                const result = await response.text();
+                
+                if (response.status === 401) {
+                    showResult('mcpResult', 
+                        `❌ Authentication failed (expected with mock token)<br>
+                         ℹ️ In production, use real Clerk tokens`, 'error');
+                } else {
+                    showResult('mcpResult', 
+                        `📤 MCP Request Status: ${response.status}<br>
+                         📥 Response: <pre style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 3px;">${result.substring(0, 300)}${result.length > 300 ? '...' : ''}</pre>`, 'info');
+                    markStepCompleted('step5');
+                }
+            } catch (error) {
+                showResult('mcpResult', `❌ MCP request failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-check server health on page load
+        window.addEventListener('load', () => {
+            setTimeout(checkServerHealth, 500);
+        });
+    </script>
+</body>
+</html>

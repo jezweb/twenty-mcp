@@ -117,6 +117,92 @@ $env:TWENTY_API_KEY="your-api-key-here"
 $env:TWENTY_BASE_URL="https://api.twenty.com"
 ```
 
+## OAuth Setup (Advanced)
+
+The Twenty MCP Server supports OAuth 2.1 authentication for enhanced security and multi-user support.
+
+### Step 1: Interactive OAuth Setup
+
+Use the built-in OAuth setup CLI:
+
+**Git Bash (Recommended):**
+```bash
+npm run setup:oauth
+```
+
+**Command Prompt:**
+```cmd
+npm run setup:oauth
+```
+
+**PowerShell:**
+```powershell
+npm run setup:oauth
+```
+
+### Step 2: Manual OAuth Configuration
+
+If you prefer manual configuration, add these to your `.env` file:
+
+```env
+# OAuth Configuration
+AUTH_ENABLED=true
+REQUIRE_AUTH=false
+AUTH_PROVIDER=clerk
+
+# Clerk Configuration  
+CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key
+CLERK_SECRET_KEY=sk_test_your_secret_key
+CLERK_DOMAIN=your-app.clerk.accounts.dev
+
+# Security
+API_KEY_ENCRYPTION_SECRET=your-32-byte-hex-string-here
+
+# Server Configuration
+MCP_SERVER_URL=http://localhost:3000
+PORT=3000
+```
+
+### Step 3: Windows Environment Variables for OAuth
+
+**Command Prompt:**
+```cmd
+set AUTH_ENABLED=true
+set CLERK_SECRET_KEY=sk_test_your_secret_key
+set CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key
+set API_KEY_ENCRYPTION_SECRET=your-32-byte-hex-string
+```
+
+**PowerShell:**
+```powershell
+$env:AUTH_ENABLED="true"
+$env:CLERK_SECRET_KEY="sk_test_your_secret_key"
+$env:CLERK_PUBLISHABLE_KEY="pk_test_your_publishable_key"
+$env:API_KEY_ENCRYPTION_SECRET="your-32-byte-hex-string"
+```
+
+### Step 4: Test OAuth Setup
+
+```bash
+# Test OAuth endpoints
+npm run test:oauth
+
+# Start server with OAuth
+npm start
+```
+
+### OAuth vs API Key Mode
+
+| Mode | Setup Complexity | Security | Multi-user |
+|------|------------------|----------|------------|
+| **API Key** | Simple | Basic | ❌ Single user |
+| **OAuth** | Moderate | Enhanced | ✅ Multiple users |
+
+**Choose OAuth for:**
+- Multi-user deployments
+- Enhanced security requirements
+- Production environments
+
 ## Common Windows Issues
 
 ### Issue: "Permission denied" errors

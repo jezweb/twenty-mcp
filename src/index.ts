@@ -14,9 +14,22 @@ async function main() {
     process.exit(1);
   }
 
+  const authEnabled = process.env.AUTH_ENABLED === 'true';
+  
   const server = new McpServer({
     name: 'twenty-mcp-server',
     version: '1.0.0',
+  }, {
+    capabilities: {
+      tools: {},
+      experimental: {
+        authentication: {
+          type: 'oauth2',
+          required: false,  // Stdio mode doesn't require auth
+          enabled: authEnabled
+        }
+      }
+    }
   });
 
   const client = new TwentyClient({

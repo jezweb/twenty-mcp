@@ -41,6 +41,7 @@ async function validateConfiguration() {
   
   const apiKey = process.env.TWENTY_API_KEY;
   const baseUrl = process.env.TWENTY_BASE_URL;
+  const authEnabled = process.env.AUTH_ENABLED === 'true';
 
   if (!apiKey) {
     logError('TWENTY_API_KEY environment variable is not set');
@@ -71,6 +72,57 @@ async function validateConfiguration() {
     } catch (error) {
       logError('Base URL is not valid: ' + error.message);
       hasErrors = true;
+    }
+  }
+  
+  // Check auth configuration if enabled
+  if (authEnabled) {
+    logInfo('Checking OAuth authentication configuration...');
+    
+    const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+    const clerkPublishableKey = process.env.CLERK_PUBLISHABLE_KEY;
+    const clerkDomain = process.env.CLERK_DOMAIN;
+    const encryptionSecret = process.env.API_KEY_ENCRYPTION_SECRET;
+    
+    if (!clerkSecretKey) {
+      logError('CLERK_SECRET_KEY is required when AUTH_ENABLED=true');
+      hasErrors = true;
+    } else if (!clerkSecretKey.startsWith('sk_')) {
+      logWarning('CLERK_SECRET_KEY should start with "sk_"');
+    } else {
+      logSuccess('CLERK_SECRET_KEY is set');
+    }
+    
+    if (!clerkPublishableKey) {
+      logWarning('CLERK_PUBLISHABLE_KEY is not set (optional but recommended)');
+    } else if (!clerkPublishableKey.startsWith('pk_')) {
+      logWarning('CLERK_PUBLISHABLE_KEY should start with "pk_"');
+    } else {
+      logSuccess('CLERK_PUBLISHABLE_KEY is set');
+    }
+    
+    if (!clerkDomain) {
+      logError('CLERK_DOMAIN is required when AUTH_ENABLED=true');
+      hasErrors = true;
+    } else {
+      logSuccess(`CLERK_DOMAIN is set: ${clerkDomain}`);
+    }
+    
+    if (!encryptionSecret) {
+      logError('API_KEY_ENCRYPTION_SECRET is required when AUTH_ENABLED=true');
+      logInfo('Generate one with: openssl rand -hex 32');
+      hasErrors = true;
+    } else if (encryptionSecret.length < 32) {
+      logWarning('API_KEY_ENCRYPTION_SECRET should be at least 32 characters');
+    } else {
+      logSuccess('API_KEY_ENCRYPTION_SECRET is set');
+    }
+    
+    const serverUrl = process.env.MCP_SERVER_URL;
+    if (!serverUrl) {
+      logWarning('MCP_SERVER_URL is not set (defaults to http://localhost:3000)');
+    } else {
+      logSuccess(`MCP_SERVER_URL is set: ${serverUrl}`);
     }
   }
 

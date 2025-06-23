@@ -38,6 +38,30 @@ Tests:
 - Company management
 - Task creation
 
+### 3. OAuth Test Suite (OAuth Configuration Required)
+Comprehensive OAuth 2.1 authentication testing:
+
+```bash
+# Run OAuth test suite
+npm run test:oauth
+```
+
+Tests:
+- OAuth discovery endpoints
+- Token validation and security
+- API key encryption/decryption
+- Authentication middleware
+- Protected resource access
+- Error handling and edge cases
+- CORS configuration
+- Backward compatibility
+
+**Prerequisites for OAuth Testing:**
+- OAuth must be enabled (`AUTH_ENABLED=true`)
+- Valid Clerk credentials in environment
+- Encryption secret configured
+- Server running on test port
+
 ## Test Output
 
 Test results are saved in the `test-results/` directory:
@@ -59,10 +83,29 @@ The repository includes GitHub Actions workflows for automated testing:
 
 ### Prerequisites
 
-1. Create a `.env` file with your Twenty API credentials:
+1. **For Basic Testing** - Create a `.env` file with your Twenty API credentials:
 ```env
 TWENTY_API_KEY=your_api_key_here
 TWENTY_BASE_URL=https://twenty.app.jezweb.com
+```
+
+2. **For OAuth Testing** - Additional OAuth configuration:
+```env
+# OAuth Configuration
+AUTH_ENABLED=true
+CLERK_SECRET_KEY=sk_test_your_clerk_secret_key
+CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key
+CLERK_DOMAIN=your-app.clerk.accounts.dev
+API_KEY_ENCRYPTION_SECRET=your-32-byte-hex-string-here
+
+# Server Configuration
+MCP_SERVER_URL=http://localhost:3000
+PORT=3000
+```
+
+You can set up OAuth quickly with:
+```bash
+npm run setup:oauth
 ```
 
 2. Install dependencies:
@@ -87,8 +130,29 @@ npm test
 # Full test suite with detailed output
 npm run test:full
 
+# OAuth test suite (requires OAuth setup)
+npm run test:oauth
+
 # Run specific test file
 node tests/run-tests.js
+
+# Run all test suites
+npm run test:smoke && npm test && npm run test:oauth
+```
+
+### Test Sequence Recommendation
+
+For comprehensive testing, run in this order:
+
+```bash
+# 1. Smoke tests (quick validation)
+npm run test:smoke
+
+# 2. Integration tests (with Twenty API)
+npm test
+
+# 3. OAuth tests (with OAuth configuration)
+npm run test:oauth
 ```
 
 ## Test Coverage

@@ -14,6 +14,7 @@ A Model Context Protocol (MCP) server that provides seamless integration with th
 - [Quick Start](#quick-start)
 - [Installation](#installation)
 - [Configuration](#configuration)
+- [OAuth Authentication](#oauth-authentication)
 - [Verification](#verification)
 - [IDE Integration](#ide-integration)
 - [Usage](#usage)
@@ -33,6 +34,7 @@ This MCP server transforms your Twenty CRM instance into a powerful tool accessi
 - **✅ Task Management**: Create and manage tasks
 - **🔗 Relationship Management**: Link entities and analyze connections
 - **🔍 Metadata Discovery**: Explore CRM schema and field definitions
+- **🔐 OAuth 2.1 Authentication**: Secure user-specific API key management
 - **🔒 Full TypeScript Support**: Type-safe operations with validation
 
 **Total: 29 MCP Tools** providing comprehensive CRM automation capabilities. [See full tool list →](TOOLS.md)
@@ -75,7 +77,24 @@ git --version
 
 ## 🚀 Quick Start
 
-For experienced users who want to get up and running quickly:
+### Option 1: Easy Install (Recommended for Non-Technical Users)
+
+```bash
+# Install globally with npm
+npm install -g twenty-mcp-server
+
+# Run the interactive setup wizard
+twenty-mcp setup
+
+# Start the server
+twenty-mcp start
+```
+
+That's it! The CLI will guide you through everything else.
+
+### Option 2: Git Clone (For Developers)
+
+For experienced users who want to clone and modify the source:
 
 ```bash
 # Clone, install, configure, and run
@@ -107,13 +126,44 @@ Then configure your IDE using the absolute path shown by the installer.
 
 | Method | When to Use | Time | Platform |
 |--------|------------|------|----------|
-| **🎯 Quick Install** | Recommended for most users | ~2 minutes | Linux/macOS/Git Bash |
-| **🔧 Manual Install** | Windows Command Prompt users or custom setup needs | ~5 minutes | All platforms |
-| **📦 Windows Guide** | Windows users without Git Bash | ~5 minutes | Windows only |
+| **🌟 npm Global Install** | Recommended for all users! | ~1 minute | All platforms |
+| **🎯 Git Clone + Install** | Developers who want to modify code | ~3 minutes | Linux/macOS/Git Bash |
+| **🔧 Manual Git Setup** | Windows Command Prompt or custom needs | ~5 minutes | All platforms |
 
-### Option 1: Quick Install (Recommended)
+### Option 1: npm Global Install (Recommended)
 
-The installation script automates the entire setup process:
+The easiest way to install Twenty MCP Server is via npm:
+
+```bash
+# Install globally
+npm install -g twenty-mcp-server
+
+# Verify installation
+twenty-mcp --version
+
+# Run setup wizard
+twenty-mcp setup
+```
+
+**Benefits:**
+- ✅ Works on all platforms (Windows, macOS, Linux)
+- ✅ Automatic PATH configuration
+- ✅ Interactive setup wizard guides you through everything
+- ✅ No manual file management or path configuration
+- ✅ Easy updates with `npm update -g twenty-mcp-server`
+- ✅ Built-in CLI commands for management and testing
+- ✅ Professional configuration management
+
+**What the setup wizard configures:**
+- 🔧 Twenty CRM API connection
+- 🔐 OAuth 2.1 authentication (optional)
+- 🛡️ IP address protection (optional)
+- ⚙️ Server preferences and defaults
+- 📁 Cross-platform configuration storage
+
+### Option 2: Git Clone Installation
+
+For developers who want to modify the source code:
 
 ```bash
 # Step 1: Clone the repository
@@ -314,6 +364,75 @@ echo $TWENTY_API_KEY  # Should show your key
 # No manual loading needed for npm commands
 ```
 
+## OAuth Authentication
+
+The Twenty MCP Server supports OAuth 2.1 authentication following the [MCP Authentication Specification](https://modelcontextprotocol.io/specification/2025-06-18/basic/index#auth). This enables secure, user-specific API key management and multi-user deployments.
+
+### 🔐 OAuth Features
+
+- **🔒 Secure API Key Storage**: User API keys encrypted with AES-256-GCM
+- **👤 User-Specific Access**: Each user manages their own Twenty CRM connection
+- **🔄 Backward Compatible**: Works alongside traditional API key configuration
+- **🛡️ Clerk Integration**: Production-ready authentication provider
+- **📋 Discovery Endpoints**: Full MCP OAuth specification compliance
+
+### 🚀 Quick OAuth Setup
+
+Run the interactive OAuth setup CLI:
+
+```bash
+npm run setup:oauth
+```
+
+This will guide you through:
+1. Enabling OAuth authentication
+2. Configuring Clerk credentials
+3. Setting up encryption secrets
+4. Testing the integration
+
+### 📚 OAuth Documentation
+
+For detailed OAuth implementation guide, see **[OAUTH.md](OAUTH.md)**:
+
+- **Complete OAuth 2.1 Flow**: Step-by-step implementation
+- **Security Best Practices**: Encryption, token validation, CORS
+- **Client Integration Examples**: JavaScript, Python, curl
+- **Production Deployment**: Environment setup and troubleshooting
+
+### 🧪 OAuth Testing
+
+Test your OAuth setup:
+
+```bash
+# Run comprehensive OAuth test suite
+npm run test:oauth
+
+# Test specific OAuth endpoints
+curl http://localhost:3000/.well-known/oauth-protected-resource
+curl http://localhost:3000/.well-known/oauth-authorization-server
+```
+
+### ⚙️ OAuth vs API Key Configuration
+
+| Feature | API Key Mode | OAuth Mode |
+|---------|-------------|------------|
+| **Setup Complexity** | Simple | Moderate |
+| **Security** | Shared key | User-specific encrypted keys |
+| **Multi-user** | ❌ Single user | ✅ Multiple users |
+| **Authentication** | Query parameter | Bearer token |
+| **Key Storage** | Environment variables | Encrypted in Clerk |
+| **Backward Compatibility** | ✅ Full | ✅ Full (when auth disabled) |
+
+Choose **API Key mode** for:
+- Single-user deployments
+- Simple integrations
+- Quick prototyping
+
+Choose **OAuth mode** for:
+- Multi-user applications
+- Production deployments
+- Enhanced security requirements
+
 ## Verification
 
 Before configuring your IDE, verify everything is working:
@@ -389,7 +508,21 @@ Configure Claude Desktop to use your Twenty MCP server:
 
 #### 2. Edit Configuration
 
-Add your Twenty MCP server configuration:
+**If you installed via npm (recommended):**
+
+```json
+{
+  "mcpServers": {
+    "twenty-crm": {
+      "command": "twenty-mcp",
+      "args": ["start", "--stdio"],
+      "env": {}
+    }
+  }
+}
+```
+
+**If you cloned from Git:**
 
 ```json
 {
@@ -413,6 +546,21 @@ Add your Twenty MCP server configuration:
 > - Using wrong slashes on Windows (use `/` or `\\`)
 
 #### 3. Real Examples
+
+**npm Installation (All Platforms):**
+```json
+{
+  "mcpServers": {
+    "twenty-crm": {
+      "command": "twenty-mcp",
+      "args": ["start", "--stdio"],
+      "env": {}
+    }
+  }
+}
+```
+
+**Git Installation Examples:**
 
 **macOS Example:**
 ```json
@@ -526,7 +674,81 @@ http://localhost:3000/mcp?apiKey=your-key&baseUrl=https://your-instance.com
 ```
 </details>
 
-## Usage
+## CLI Commands
+
+Twenty MCP Server includes a powerful CLI for easy management:
+
+### Setup and Configuration
+
+```bash
+# Interactive setup wizard (recommended for first-time setup)
+twenty-mcp setup
+
+# Setup with OAuth authentication
+twenty-mcp setup --oauth
+
+# Setup with IP protection
+twenty-mcp setup --ip-protection
+
+# Import existing .env configuration
+twenty-mcp setup --import
+
+# Reset to default configuration
+twenty-mcp setup --reset
+```
+
+### Server Management
+
+```bash
+# Start the server (HTTP mode, default port 3000)
+twenty-mcp start
+
+# Start with custom port
+twenty-mcp start --port 8080
+
+# Start in stdio mode (for direct MCP protocol communication)
+twenty-mcp start --stdio
+
+# Start with verbose logging
+twenty-mcp start --verbose
+```
+
+### Testing and Diagnostics
+
+```bash
+# Test configuration and connection
+twenty-mcp test
+
+# Run full test suite including API tests
+twenty-mcp test --full
+
+# Test OAuth authentication endpoints
+twenty-mcp test --oauth
+
+# Run smoke tests only (no API calls)
+twenty-mcp test --smoke
+```
+
+### Status and Information
+
+```bash
+# Show server status and configuration
+twenty-mcp status
+
+# Show detailed status information
+twenty-mcp status --verbose
+
+# Output status in JSON format
+twenty-mcp status --json
+
+# Show help for all commands
+twenty-mcp help
+
+# Show version
+twenty-mcp --version
+```
+
+## AI Assistant Usage
 
 ### Basic Commands
 
