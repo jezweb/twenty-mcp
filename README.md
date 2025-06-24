@@ -77,7 +77,22 @@ git --version
 
 ## 🚀 Quick Start
 
-### Option 1: Easy Install (Recommended for Non-Technical Users)
+### Option 1: Instant Trial (No Installation Required) ⚡
+
+```bash
+# Try instantly with npx - no installation needed!
+npx twenty-mcp-server setup
+
+# Test your configuration
+npx twenty-mcp-server test
+
+# Start the server
+npx twenty-mcp-server start
+```
+
+Perfect for trying Twenty MCP Server before committing to installation!
+
+### Option 2: Global Installation (Best for Regular Use)
 
 ```bash
 # Install globally with npm
@@ -92,7 +107,7 @@ twenty-mcp start
 
 That's it! The CLI will guide you through everything else.
 
-### Option 2: Git Clone (For Developers)
+### Option 3: Git Clone (For Developers)
 
 For experienced users who want to clone and modify the source:
 
@@ -126,13 +141,38 @@ Then configure your IDE using the absolute path shown by the installer.
 
 | Method | When to Use | Time | Platform |
 |--------|------------|------|----------|
-| **🌟 npm Global Install** | Recommended for all users! | ~1 minute | All platforms |
+| **⚡ npx Instant Trial** | Try before installing - no commitment! | ~30 seconds | All platforms |
+| **🌟 npm Global Install** | Regular use and best performance | ~1 minute | All platforms |
 | **🎯 Git Clone + Install** | Developers who want to modify code | ~3 minutes | Linux/macOS/Git Bash |
 | **🔧 Manual Git Setup** | Windows Command Prompt or custom needs | ~5 minutes | All platforms |
 
-### Option 1: npm Global Install (Recommended)
+### Option 1: npx Instant Trial (Try Before Installing)
 
-The easiest way to install Twenty MCP Server is via npm:
+Experience Twenty MCP Server instantly without any installation:
+
+```bash
+# Try it right now - no installation required!
+npx twenty-mcp-server setup
+
+# Configuration is saved globally for future npx runs
+npx twenty-mcp-server test
+
+# Start using it immediately
+npx twenty-mcp-server start
+```
+
+**Benefits:**
+- ✅ Zero installation - try instantly
+- ✅ Always runs the latest version
+- ✅ Configuration persists between runs
+- ✅ Perfect for testing and evaluation
+- ✅ No global installation clutter
+
+**Ready to install permanently?** Simply run: `npm install -g twenty-mcp-server`
+
+### Option 2: npm Global Install (Best for Regular Use)
+
+For users who want Twenty MCP Server permanently installed:
 
 ```bash
 # Install globally
@@ -161,7 +201,7 @@ twenty-mcp setup
 - ⚙️ Server preferences and defaults
 - 📁 Cross-platform configuration storage
 
-### Option 2: Git Clone Installation
+### Option 3: Git Clone Installation
 
 For developers who want to modify the source code:
 
@@ -187,7 +227,7 @@ The install script will:
 
 > **📝 Note**: Save the absolute path shown by the installer - you'll need it for IDE configuration!
 
-### Option 2: Manual Installation
+### Option 4: Manual Installation
 
 Perfect for Windows Command Prompt users or those who prefer manual control:
 
@@ -508,7 +548,7 @@ Configure Claude Desktop to use your Twenty MCP server:
 
 #### 2. Edit Configuration
 
-**If you installed via npm (recommended):**
+**If you installed via npm or use npx:**
 
 ```json
 {
@@ -521,6 +561,8 @@ Configure Claude Desktop to use your Twenty MCP server:
   }
 }
 ```
+
+**Note for npx users:** Your configuration is automatically saved globally, so Claude Desktop will work seamlessly even when using npx!
 
 **If you cloned from Git:**
 
@@ -547,7 +589,7 @@ Configure Claude Desktop to use your Twenty MCP server:
 
 #### 3. Real Examples
 
-**npm Installation (All Platforms):**
+**npm Installation or npx Usage (All Platforms):**
 ```json
 {
   "mcpServers": {
@@ -559,6 +601,8 @@ Configure Claude Desktop to use your Twenty MCP server:
   }
 }
 ```
+
+**💡 npx users:** This same configuration works whether you use `npx twenty-mcp-server` or install globally!
 
 **Git Installation Examples:**
 

@@ -1,7 +1,7 @@
 {
   "name": "twenty-mcp-server",
   "version": "1.1.0",
-  "description": "Easy-to-install Model Context Protocol server for Twenty CRM. Simple 'npm install -g' setup with interactive CLI wizard for non-technical users.",
+  "description": "Easy-to-install Model Context Protocol server for Twenty CRM. Try instantly with 'npx twenty-mcp-server setup' or install globally for permanent use.",
   "main": "dist/http-server.js",
   "module": "./src/http-server.ts",
   "type": "module",
@@ -30,7 +30,7 @@
     "docker:run": "docker run -p 3000:3000 -e TWENTY_API_KEY=$TWENTY_API_KEY -e TWENTY_BASE_URL=$TWENTY_BASE_URL twenty-mcp",
     "prepack": "npm run build && npm run test:smoke",
     "prepublishOnly": "npm run prepack",
-    "postinstall": "node -e \"console.log('\\n🎉 Twenty MCP Server installed! Run \\\"twenty-mcp setup\\\" to get started.\\n')\""
+    "postinstall": "node -e \"if (process.env.npm_command !== 'exec') { console.log('\\n🎉 Twenty MCP Server installed! Run \\\"twenty-mcp setup\\\" to get started.\\n'); } else { console.log('\\n✨ Running via npx - configuration will persist between runs!\\n'); }\""
   },
   "keywords": [
     "mcp",
@@ -50,7 +50,11 @@
     "interactive-setup",
     "oauth",
     "ip-protection",
-    "enterprise"
+    "enterprise",
+    "npx",
+    "try-before-install",
+    "no-install",
+    "instant-trial"
   ],
   "author": "jezweb",
   "license": "MIT",

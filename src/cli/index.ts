@@ -14,7 +14,19 @@ import { startCommand } from './commands/start.js';
 import { testCommand } from './commands/test.js';
 import { statusCommand } from './commands/status.js';
 
+// Import execution context utilities
+import { getExecutionContext } from './utils/execution-context.js';
+import { 
+  showContextHeader, 
+  showContextualHelp, 
+  showNPXWelcome,
+  showNPXPerformanceTip
+} from './utils/npx-helpers.js';
+
 const program = new Command();
+
+// Get execution context for context-aware behavior
+const executionContext = getExecutionContext();
 
 // Get package version
 function getVersion(): string {
@@ -27,13 +39,14 @@ function getVersion(): string {
   }
 }
 
-// CLI Header
+// Context-aware CLI header
 function showHeader() {
-  console.log(chalk.blue('┌─────────────────────────────────────────────────────────────┐'));
-  console.log(chalk.blue('│') + chalk.bold.white('                   Twenty MCP Server                    ') + chalk.blue('│'));
-  console.log(chalk.blue('│') + chalk.gray('         Model Context Protocol for Twenty CRM          ') + chalk.blue('│'));
-  console.log(chalk.blue('└─────────────────────────────────────────────────────────────┘'));
-  console.log('');
+  showContextHeader(executionContext);
+  
+  // Show npx-specific welcome message for first-time users
+  if (executionContext.type === 'npx') {
+    showNPXPerformanceTip(executionContext);
+  }
 }
 
 // Configure CLI
@@ -92,21 +105,9 @@ program
       program.help();
     } else {
       showHeader();
-      console.log(chalk.bold.yellow('🚀 Quick Start:'));
-      console.log('');
-      console.log('  1. ' + chalk.cyan('twenty-mcp setup') + '     - Configure your server');
-      console.log('  2. ' + chalk.cyan('twenty-mcp test') + '      - Validate configuration');
-      console.log('  3. ' + chalk.cyan('twenty-mcp start') + '     - Start the server');
-      console.log('');
-      console.log(chalk.bold.yellow('📚 Commands:'));
+      showContextualHelp(executionContext);
       console.log('');
       program.outputHelp();
-      console.log('');
-      console.log(chalk.bold.yellow('🔗 Resources:'));
-      console.log('');
-      console.log('  Documentation: ' + chalk.underline('https://github.com/jezweb/twenty-mcp#readme'));
-      console.log('  Issues: ' + chalk.underline('https://github.com/jezweb/twenty-mcp/issues'));
-      console.log('  Twenty CRM: ' + chalk.underline('https://twenty.com'));
       console.log('');
     }
   });
@@ -128,21 +129,15 @@ process.on('unhandledRejection', (reason) => {
 // Show help if no command provided
 if (!process.argv.slice(2).length) {
   showHeader();
-  console.log(chalk.bold.yellow('🚀 Quick Start:'));
-  console.log('');
-  console.log('  1. ' + chalk.cyan('twenty-mcp setup') + '     - Configure your server');
-  console.log('  2. ' + chalk.cyan('twenty-mcp test') + '      - Validate configuration');
-  console.log('  3. ' + chalk.cyan('twenty-mcp start') + '     - Start the server');
-  console.log('');
-  console.log(chalk.bold.yellow('📚 Commands:'));
+  
+  // Show npx welcome for first-time npx users
+  if (executionContext.type === 'npx') {
+    showNPXWelcome(executionContext);
+  }
+  
+  showContextualHelp(executionContext);
   console.log('');
   program.outputHelp();
-  console.log('');
-  console.log(chalk.bold.yellow('🔗 Resources:'));
-  console.log('');
-  console.log('  Documentation: ' + chalk.underline('https://github.com/jezweb/twenty-mcp#readme'));
-  console.log('  Issues: ' + chalk.underline('https://github.com/jezweb/twenty-mcp/issues'));
-  console.log('  Twenty CRM: ' + chalk.underline('https://twenty.com'));
   console.log('');
 } else {
   // Parse arguments and run

@@ -4,6 +4,8 @@ import { ConfigManager, TwentyMCPConfig } from '../config-manager.js';
 import crypto from 'crypto';
 import { isIP } from 'node:net';
 import { crossPlatformSpawn } from '../platform-utils.js';
+import { getExecutionContext } from '../utils/execution-context.js';
+import { showNPXWelcome, explainNPXConfiguration, showNPXCompletion } from '../utils/npx-helpers.js';
 
 interface SetupOptions {
   oauth?: boolean;
@@ -15,11 +17,21 @@ interface SetupOptions {
 }
 
 export async function enhancedSetupCommand(options: SetupOptions) {
-  console.log(chalk.bold.green('🛠️  Twenty MCP Server Enhanced Setup Wizard'));
-  console.log(chalk.gray('Professional configuration for your Twenty MCP Server\n'));
+  const executionContext = getExecutionContext();
+  
+  // Show context-appropriate setup header
+  if (executionContext.type === 'npx') {
+    console.log(chalk.bold.green('🛠️  Twenty MCP Server Setup (via npx)'));
+    console.log(chalk.gray('Configure your Twenty MCP Server - settings will be saved globally\n'));
+  } else {
+    console.log(chalk.bold.green('🛠️  Twenty MCP Server Enhanced Setup Wizard'));
+    console.log(chalk.gray('Professional configuration for your Twenty MCP Server\n'));
+  }
 
   try {
-    const configManager = new ConfigManager(options.global ? undefined : process.cwd());
+    // For npx users, always use global config unless explicitly specified
+    const useGlobal = executionContext.type === 'npx' ? true : (options.global || false);
+    const configManager = new ConfigManager(useGlobal ? undefined : process.cwd());
     let config: TwentyMCPConfig;
 
     // Handle special modes
@@ -46,7 +58,7 @@ export async function enhancedSetupCommand(options: SetupOptions) {
     }
 
     // Welcome and overview
-    await showWelcome();
+    await showWelcome(executionContext);
 
     // Step 1: Twenty CRM Configuration
     config = await setupTwentyCRM(config);
@@ -76,7 +88,7 @@ export async function enhancedSetupCommand(options: SetupOptions) {
     }
 
     // Step 8: Show completion and next steps
-    await showCompletion(config, configManager);
+    await showCompletion(config, configManager, executionContext);
 
   } catch (error) {
     if (error instanceof Error && error.message === 'SETUP_CANCELLED') {
@@ -100,10 +112,18 @@ async function confirmUpdate(): Promise<boolean> {
   return update;
 }
 
-async function showWelcome() {
-  console.log(chalk.bold.cyan('\n🎉 Welcome to Twenty MCP Server Setup!'));
-  console.log(chalk.gray('\nThis wizard will help you configure your Twenty CRM integration for AI assistants.'));
-  console.log(chalk.gray('We\'ll walk through each feature and explain the benefits.\n'));
+async function showWelcome(executionContext: any) {
+  if (executionContext.type === 'npx') {
+    console.log(chalk.bold.cyan('\n🎉 Welcome to Twenty MCP Server Setup!'));
+    console.log(chalk.gray('\nYou\'re configuring Twenty MCP Server via npx - perfect for trying it out!'));
+    console.log(chalk.gray('Your configuration will be saved globally and persist between npx runs.\n'));
+    
+    explainNPXConfiguration();
+  } else {
+    console.log(chalk.bold.cyan('\n🎉 Welcome to Twenty MCP Server Setup!'));
+    console.log(chalk.gray('\nThis wizard will help you configure your Twenty CRM integration for AI assistants.'));
+    console.log(chalk.gray('We\'ll walk through each feature and explain the benefits.\n'));
+  }
   
   const { ready } = await inquirer.prompt([
     {
@@ -537,9 +557,13 @@ async function testConfiguration(configManager: ConfigManager) {
   });
 }
 
-async function showCompletion(config: TwentyMCPConfig, configManager: ConfigManager) {
-  console.log(chalk.bold.green('\n🎉 Setup Complete!'));
-  console.log(chalk.gray('Your Twenty MCP Server is professionally configured\n'));
+async function showCompletion(config: TwentyMCPConfig, configManager: ConfigManager, executionContext: any) {
+  if (executionContext.type === 'npx') {
+    showNPXCompletion();
+  } else {
+    console.log(chalk.bold.green('\n🎉 Setup Complete!'));
+    console.log(chalk.gray('Your Twenty MCP Server is professionally configured\n'));
+  }
 
   // Configuration summary
   console.log(chalk.bold.yellow('📋 Configuration Summary:'));
@@ -549,16 +573,20 @@ async function showCompletion(config: TwentyMCPConfig, configManager: ConfigMana
   console.log(`  Server Mode: ${chalk.blue(config.server.mode.toUpperCase())}`);
   console.log(`  Port: ${chalk.blue(config.server.port)}\n`);
 
-  // Next steps
-  console.log(chalk.bold.yellow('🚀 Next Steps:'));
-  console.log(chalk.cyan('  1. twenty-mcp test') + chalk.gray('     - Test your configuration'));
-  console.log(chalk.cyan('  2. twenty-mcp start') + chalk.gray('    - Start the server'));
-  console.log(chalk.cyan('  3. twenty-mcp status') + chalk.gray('   - Check server status\n'));
+  // Context-aware next steps
+  const commandPrefix = executionContext.type === 'npx' ? 'npx twenty-mcp-server' : 'twenty-mcp';
+  
+  if (executionContext.type !== 'npx') {
+    console.log(chalk.bold.yellow('🚀 Next Steps:'));
+    console.log(chalk.cyan(`  1. ${commandPrefix} test`) + chalk.gray('     - Test your configuration'));
+    console.log(chalk.cyan(`  2. ${commandPrefix} start`) + chalk.gray('    - Start the server'));
+    console.log(chalk.cyan(`  3. ${commandPrefix} status`) + chalk.gray('   - Check server status\n'));
 
-  // IDE integration
-  console.log(chalk.bold.yellow('💻 IDE Integration:'));
-  console.log(chalk.gray('  Use this path in your IDE configuration:'));
-  console.log(chalk.cyan(`  ${process.cwd()}/dist/index.js\n`));
+    // IDE integration
+    console.log(chalk.bold.yellow('💻 IDE Integration:'));
+    console.log(chalk.gray('  Use this path in your IDE configuration:'));
+    console.log(chalk.cyan(`  ${process.cwd()}/dist/index.js\n`));
+  }
 
   // Additional resources
   console.log(chalk.bold.yellow('📚 Resources:'));
@@ -569,7 +597,7 @@ async function showCompletion(config: TwentyMCPConfig, configManager: ConfigMana
 
   if (config.auth.enabled) {
     console.log(chalk.bold.yellow('🔐 OAuth Setup:'));
-    console.log(chalk.gray('  • Test OAuth: twenty-mcp test --oauth'));
+    console.log(chalk.gray(`  • Test OAuth: ${commandPrefix} test --oauth`));
     console.log(chalk.gray('  • OAuth docs: OAUTH.md\n'));
   }
 }
