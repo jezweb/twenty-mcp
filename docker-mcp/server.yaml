@@ -1,0 +1,34 @@
+name: twenty-mcp
+image: mcp/twenty-mcp
+type: server
+meta:
+  category: productivity
+  tags:
+    - crm
+    - twenty
+    - sales
+    - contacts
+    - companies
+about:
+  title: Twenty CRM
+  description: MCP server for Twenty CRM with 29 tools for contacts, companies, opportunities, tasks, and activities management
+  icon: https://avatars.githubusercontent.com/u/137872558?s=200&v=4
+source:
+  project: https://github.com/jezweb/twenty-mcp
+  branch: main
+  dockerfile: Dockerfile
+run:
+  env:
+    TWENTY_API_KEY: $TWENTY_API_KEY
+    TWENTY_BASE_URL: $TWENTY_BASE_URL
+config:
+  secrets:
+    - name: twenty.api_key
+      env: TWENTY_API_KEY
+      example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      description: Your Twenty CRM API key from Settings > Developers > API & Webhooks
+  environment:
+    - name: twenty.base_url
+      env: TWENTY_BASE_URL
+      example: https://api.twenty.com
+      description: Your Twenty CRM instance URL (no trailing slash)

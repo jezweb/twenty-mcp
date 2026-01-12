@@ -141,10 +141,27 @@ Then configure your IDE using the absolute path shown by the installer.
 
 | Method | When to Use | Time | Platform |
 |--------|------------|------|----------|
+| **🐳 Docker MCP** | Docker Desktop users with MCP Toolkit | ~1 minute | All platforms |
 | **⚡ npx Instant Trial** | Try before installing - no commitment! | ~30 seconds | All platforms |
 | **🌟 npm Global Install** | Regular use and best performance | ~1 minute | All platforms |
 | **🎯 Git Clone + Install** | Developers who want to modify code | ~3 minutes | Linux/macOS/Git Bash |
 | **🔧 Manual Git Setup** | Windows Command Prompt or custom needs | ~5 minutes | All platforms |
+
+### Option 0: Docker MCP (Docker Desktop Users)
+
+If you have Docker Desktop with MCP Toolkit enabled:
+
+1. Open Docker Desktop
+2. Go to **MCP Catalog**
+3. Search for "Twenty CRM"
+4. Click **Install** and configure your API key
+
+Or use the Docker CLI:
+```bash
+docker mcp install twenty-mcp
+```
+
+Learn more at [hub.docker.com/mcp](https://hub.docker.com/mcp)
 
 ### Option 1: npx Instant Trial (Try Before Installing)
 

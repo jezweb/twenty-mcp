@@ -2,6 +2,26 @@
 
 All notable changes to Twenty MCP Server will be documented in this file.
 
+## [1.3.0] - 2026-01-12
+
+### 🎉 Added
+- **Docker MCP Support**: Now available on [Docker Hub MCP Registry](https://hub.docker.com/mcp)!
+  - Install via Docker Desktop MCP Catalog
+  - Or use `docker mcp install twenty-mcp`
+  - Configuration files in `docker-mcp/` directory
+
+### 🔒 Security
+- Updated MCP SDK to latest version (security fixes)
+- Fixed all npm audit vulnerabilities (was 7, now 0)
+- Updated body-parser, js-yaml, qs, and tmp dependencies
+
+### 📚 Documentation
+- Added Docker MCP installation option to README
+- Updated installation comparison table
+
+### 🔧 Technical Improvements
+- Repository unarchived and refreshed for continued maintenance
+
 ## [1.2.0] - 2025-06-24
 
 ### 🎉 Added
