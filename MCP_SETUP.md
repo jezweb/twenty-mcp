@@ -15,6 +15,26 @@ The Twenty MCP Server supports both traditional API key authentication and OAuth
 - Enhanced security with Clerk authentication
 - See [OAUTH.md](OAUTH.md) for detailed setup
 
+## Option 0: Docker MCP (Recommended for Docker Desktop Users)
+
+The easiest way to get started if you have Docker Desktop with MCP Toolkit enabled.
+
+### Via Docker Desktop UI
+1. Open Docker Desktop
+2. Go to **MCP Catalog**
+3. Search for "Twenty CRM"
+4. Click **Install**
+5. Configure your API key and base URL when prompted
+
+### Via Docker CLI
+```bash
+docker mcp install twenty-mcp
+```
+
+When prompted, enter:
+- **TWENTY_API_KEY**: Your API key from Twenty CRM (Settings → Developers → API & Webhooks)
+- **TWENTY_BASE_URL**: Your Twenty instance URL (e.g., `https://api.twenty.com`)
+
 ## Option 1: Claude Desktop App
 
 1. Copy this configuration to your Claude Desktop config file:
